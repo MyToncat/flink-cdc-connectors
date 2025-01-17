@@ -1,11 +1,12 @@
 /*
- * Copyright 2023 Ververica Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,9 +24,13 @@ import com.github.shyiko.mysql.binlog.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import static com.github.shyiko.mysql.binlog.event.deserialization.ColumnType.TYPED_ARRAY;
+import static com.github.shyiko.mysql.binlog.event.deserialization.ColumnType.TYPED_ARRAY_OLD;
 
 /**
  * Copied from mysql-binlog-connector 0.25.3 to support MYSQL_TYPE_TYPED_ARRAY.
+ *
+ * <p>Line 51 ~ 53: load column metadata bytes based on the length encoded before, instead of
+ * relying on readMetadata to parse it.
  *
  * <p>Line 93 ~ 98: process MYSQL_TYPE_TYPED_ARRAY metadata, imitated the code in canal <a
  * href="https://github.com/alibaba/canal/blob/master/dbsync/src/main/java/com/taobao/tddl/dbsync/binlog/event/TableMapLogEvent.java#L546">TableMapLogEvent#decodeFields</a>.
@@ -49,8 +54,11 @@ public class TableMapEventDataDeserializer implements EventDataDeserializer<Tabl
         eventData.setTable(inputStream.readZeroTerminatedString());
         int numberOfColumns = inputStream.readPackedInteger();
         eventData.setColumnTypes(inputStream.read(numberOfColumns));
-        inputStream.readPackedInteger(); // metadata length
-        eventData.setColumnMetadata(readMetadata(inputStream, eventData.getColumnTypes()));
+        int columnMetadataLength = inputStream.readPackedInteger(); // column metadata length
+        eventData.setColumnMetadata(
+                readMetadata(
+                        new ByteArrayInputStream(inputStream.read(columnMetadataLength)),
+                        eventData.getColumnTypes()));
         eventData.setColumnNullability(inputStream.readBitSet(numberOfColumns, true));
         int metadataLength = inputStream.available();
         TableMapEventMetadata metadata = null;
@@ -77,6 +85,7 @@ public class TableMapEventDataDeserializer implements EventDataDeserializer<Tabl
                 case NEWDECIMAL:
                 case FLOAT:
                 case DOUBLE:
+                case YEAR:
                     count++;
                     break;
                 default:
@@ -91,7 +100,7 @@ public class TableMapEventDataDeserializer implements EventDataDeserializer<Tabl
         int[] metadata = new int[columnTypes.length];
         for (int i = 0; i < columnTypes.length; i++) {
             ColumnType columnType = ColumnType.byCode(columnTypes[i] & 0xFF);
-            if (columnType == TYPED_ARRAY) {
+            if (columnType == TYPED_ARRAY || columnType == TYPED_ARRAY_OLD) {
                 byte[] arrayType = inputStream.read(1);
                 columnType = ColumnType.byCode(arrayType[0] & 0xFF);
             }

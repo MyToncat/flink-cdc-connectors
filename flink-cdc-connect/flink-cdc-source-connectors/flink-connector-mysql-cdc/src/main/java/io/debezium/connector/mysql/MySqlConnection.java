@@ -26,6 +26,7 @@ import io.debezium.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
@@ -38,7 +39,7 @@ import java.util.OptionalLong;
 import java.util.Properties;
 
 /**
- * Copied from Debezium project(1.9.7.final) to add custom jdbc properties in the jdbc url. The new
+ * Copied from Debezium project(1.9.8.final) to add custom jdbc properties in the jdbc url. The new
  * parameter {@code jdbcProperties} in the constructor of {@link MySqlConnectionConfiguration} will
  * be used to generate the jdbc url pattern, and may overwrite the default value.
  *
@@ -622,6 +623,7 @@ public class MySqlConnection extends JdbcConnection {
             this.jdbcConfig = JdbcConfiguration.adapt(jdbcConfigBuilder.build());
             String driverClassName = this.jdbcConfig.getString(MySqlConnectorConfig.JDBC_DRIVER);
             this.urlPattern = formatJdbcUrl(jdbcProperties);
+            DriverManager.getDrivers();
             factory =
                     JdbcConnection.patternBasedFactory(
                             urlPattern, driverClassName, getClass().getClassLoader());

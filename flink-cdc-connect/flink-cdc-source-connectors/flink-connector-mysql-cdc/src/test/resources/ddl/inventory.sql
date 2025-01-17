@@ -1,15 +1,17 @@
--- Copyright 2023 Ververica Inc.
---
--- Licensed under the Apache License, Version 2.0 (the "License");
--- you may not use this file except in compliance with the License.
--- You may obtain a copy of the License at
---   http://www.apache.org/licenses/LICENSE-2.0
--- Unless required by applicable law or agreed to in writing,
--- software distributed under the License is distributed on an
--- "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--- KIND, either express or implied.  See the License for the
--- specific language governing permissions and limitations
--- under the License.
+-- Licensed to the Apache Software Foundation (ASF) under one or more
+-- contributor license agreements.  See the NOTICE file distributed with
+-- this work for additional information regarding copyright ownership.
+-- The ASF licenses this file to You under the Apache License, Version 2.0
+-- (the "License"); you may not use this file except in compliance with
+-- the License.  You may obtain a copy of the License at
+-- 
+--      http://www.apache.org/licenses/LICENSE-2.0
+-- 
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS,
+-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-- See the License for the specific language governing permissions and
+-- limitations under the License.
 
 -- ----------------------------------------------------------------------------------------------------------------
 -- DATABASE:  inventory
@@ -149,3 +151,20 @@ VALUES ('', 0, 'flink'),
        ('E', 2, 'flink'),
        ('e', 4, 'flink'),
        ('E', 3, 'flink');
+
+CREATE TABLE `varbinary_base64_table`
+(
+    `id`         int(11) NOT NULL,
+    `order_id`   varbinary(8) NOT NULL,
+    `order_date` date         NOT NULL,
+    `quantity`   int(11) NOT NULL,
+    `product_id` int(11) NOT NULL,
+    `purchaser`  varchar(512) NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+INSERT INTO varbinary_base64_table
+VALUES (1, b'0000010000000100000001000000010000000100000001000000010000000000', '2021-03-08', 0, 0, 'flink'),
+       (2, b'0000010000000100000001000000010000000100000001000000010000000001', '2021-03-08', 10, 100, 'flink'),
+       (3, b'0000010000000100000001000000010000000100000001000000010000000010', '2021-03-08', 20, 200, 'flink'),
+       (4, b'0000010000000100000001000000010000000100000001000000010000000011', '2021-03-08', 30, 300, 'flink'),
+       (5, b'0000010000000100000001000000010000000100000001000000010000000100', '2021-03-08', 40, 400, 'flink');

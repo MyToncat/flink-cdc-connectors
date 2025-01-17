@@ -1,18 +1,19 @@
 #/bin/bash
 ################################################################################
-#  Copyright 2023 Ververica Inc.
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
 #      http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 ################################################################################
 
 echo "Compile ASN tool ..."
@@ -55,11 +56,12 @@ db2 -tvmf /asncdctools/src/asncdctables.sql
 db2 -tvmf /asncdctools/src/asncdcaddremove.sql
 
 
-# create sample table and data
-db2 -tvmf /asncdctools/src/inventory.sql
-db2 -tvmf /asncdctools/src/column_type_test.sql
+
+
+# startup-agent
 db2 -tvmf /asncdctools/src/startup-agent.sql
-sleep 10
-db2 -tvmf /asncdctools/src/startup-cdc-demo.sql
+
+
+
 
 echo "db2 setup done"
